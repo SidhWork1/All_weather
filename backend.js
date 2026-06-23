@@ -324,6 +324,15 @@ document.addEventListener('DOMContentLoaded', () => {
     themeToggle.addEventListener('click', toggleTheme);
   }
 
+  const navToggle = document.getElementById('nav-toggle');
+  const headerContainer = document.getElementById('header-container');
+  if (navToggle && headerContainer) {
+    navToggle.addEventListener('click', () => {
+      const isOpen = headerContainer.classList.toggle('nav-open');
+      navToggle.setAttribute('aria-expanded', String(isOpen));
+    });
+  }
+
   searchForm = document.getElementById('search-form');
   cityInput = document.getElementById('city-input');
   searchButton = document.getElementById('search-button');

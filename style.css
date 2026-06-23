@@ -39,11 +39,20 @@
     box-sizing: border-box;
 }
 
+html {
+    transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
 body {
     background-color: var(--bg-page);
     color: var(--text-primary);
     margin: 0;
     transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
 }
 
 .app {
@@ -59,8 +68,10 @@ body {
 /* Header */
 #header-container {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
+    gap: 0.75rem;
     background-color: var(--bg-header);
     margin: 10px;
     border: 5px solid var(--border);
@@ -71,24 +82,41 @@ body {
 
 .logo {
     display: inline-block;
-    padding-right: 50px;
-    padding-left: 50px;
     margin: 0;
     font-size: 1.25rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.nav-toggle {
+    display: none;
+    background-color: var(--bg-card);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.45rem 0.65rem;
+    cursor: pointer;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    transition: background-color var(--transition-speed), border-color var(--transition-speed);
+}
+
+.nav-toggle:hover {
+    border-color: var(--accent);
 }
 
 #main-nav {
-    display: inline-flex;
-    justify-content: space-between;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
     gap: 1rem;
-    padding-right: 80px;
-    padding-left: 50px;
 }
 
 .nav-link {
-    font-size: 20px;
+    font-size: 1rem;
     color: var(--text-primary);
     text-decoration: none;
+    transition: color var(--transition-speed);
 }
 
 .nav-link:hover {
@@ -103,11 +131,12 @@ body {
     padding: 0.5rem 0.75rem;
     cursor: pointer;
     font-size: 1.1rem;
-    transition: background-color var(--transition-speed), border-color var(--transition-speed);
+    transition: background-color var(--transition-speed), border-color var(--transition-speed), transform var(--transition-speed);
 }
 
 #theme-toggle:hover {
     border-color: var(--accent);
+    transform: scale(1.05);
 }
 
 /* Search */
@@ -119,11 +148,18 @@ body {
 
 .search-bar input {
     flex: 1;
+    min-width: 0;
+    width: 100%;
     padding: 0.5rem 0.75rem;
     border: 2px solid var(--border);
     border-radius: var(--radius);
     background-color: var(--bg-page);
     color: var(--text-primary);
+    transition: border-color var(--transition-speed), background-color var(--transition-speed);
+}
+
+.search-bar input:focus-visible {
+    border-color: var(--accent);
 }
 
 .search-bar button {
@@ -133,6 +169,12 @@ body {
     background-color: var(--accent);
     color: #ffffff;
     cursor: pointer;
+    transition: background-color var(--transition-speed), transform var(--transition-speed), opacity var(--transition-speed);
+}
+
+.search-bar button[type="submit"]:hover:not(:disabled) {
+    transform: translateY(-1px);
+    filter: brightness(1.08);
 }
 
 .clear-city {
@@ -142,6 +184,7 @@ body {
     color: var(--text-muted);
     font-size: 1rem;
     line-height: 1;
+    transition: color var(--transition-speed), border-color var(--transition-speed);
 }
 
 .clear-city:hover {
@@ -206,7 +249,12 @@ body {
     border-radius: var(--radius);
     padding: 1rem;
     margin-bottom: 1rem;
-    transition: background-color var(--transition-speed), border-color var(--transition-speed);
+    transition: background-color var(--transition-speed), border-color var(--transition-speed), transform var(--transition-speed), box-shadow var(--transition-speed);
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 /* Current weather card */
@@ -289,7 +337,12 @@ body {
     border-radius: var(--radius);
     background-color: var(--bg-card);
     font-size: 0.85rem;
-    transition: background-color var(--transition-speed), border-color var(--transition-speed);
+    transition: background-color var(--transition-speed), border-color var(--transition-speed), transform var(--transition-speed);
+}
+
+.stat-badge:hover {
+    transform: translateY(-1px);
+    border-color: var(--accent);
 }
 
 .stat-badge span {
@@ -324,7 +377,12 @@ body {
     background-color: var(--bg-page);
     color: var(--text-muted);
     font-size: 0.85rem;
-    transition: background-color var(--transition-speed), border-color var(--transition-speed);
+    transition: background-color var(--transition-speed), border-color var(--transition-speed), transform var(--transition-speed);
+}
+
+.forecast-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
 }
 
 .forecast-day {
@@ -377,7 +435,11 @@ body {
     border-radius: var(--radius);
     background-color: var(--bg-page);
     padding: 1rem;
-    transition: background-color var(--transition-speed), border-color var(--transition-speed);
+    transition: background-color var(--transition-speed), border-color var(--transition-speed), transform var(--transition-speed);
+}
+
+.insights-panel:hover {
+    transform: translateY(-1px);
 }
 
 .insights-panel h2 {
@@ -442,4 +504,152 @@ body {
 
 .footer a:hover {
     color: var(--accent);
+}
+
+/* --- Responsive: Mobile (< 480px) --- */
+@media (max-width: 479px) {
+    #header-container {
+        margin: 0.5rem;
+        padding: 0.75rem;
+        border-width: 3px;
+    }
+
+    .nav-toggle {
+        display: inline-block;
+        order: 2;
+    }
+
+    #theme-toggle {
+        order: 3;
+    }
+
+    .logo {
+        order: 1;
+        font-size: 1.1rem;
+    }
+
+    #main-nav {
+        display: none;
+        order: 4;
+        flex-direction: column;
+        width: 100%;
+        gap: 0.5rem;
+        padding-top: 0.5rem;
+        border-top: 1px solid var(--border);
+    }
+
+    #header-container.nav-open #main-nav {
+        display: flex;
+    }
+
+    .nav-link {
+        width: 100%;
+        text-align: center;
+        padding: 0.35rem 0;
+    }
+
+    .app {
+        margin: 0 0.5rem;
+        padding: 0.75rem;
+        border-width: 2px;
+    }
+
+    .search-bar form {
+        flex-wrap: wrap;
+    }
+
+    .search-bar input {
+        flex: 1 1 100%;
+    }
+
+    .search-bar button[type="submit"] {
+        flex: 1;
+    }
+
+    .weather-temp {
+        font-size: 2.5rem;
+    }
+
+    .weather-stats {
+        flex-direction: column;
+    }
+
+    .stat-badge {
+        min-width: 0;
+    }
+
+    .forecast-strip {
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 0.25rem;
+    }
+
+    .forecast-card {
+        flex: 0 0 88px;
+        scroll-snap-align: start;
+    }
+
+    .insight-row {
+        flex-wrap: wrap;
+        font-size: 0.85rem;
+    }
+
+    .insight-condition {
+        flex: 1 1 100%;
+        text-align: left;
+        order: 3;
+    }
+}
+
+/* --- Responsive: Tablet (480px – 768px) --- */
+@media (min-width: 480px) and (max-width: 767px) {
+    #header-container {
+        margin: 0.75rem;
+    }
+
+    #main-nav {
+        gap: 0.75rem;
+    }
+
+    .nav-link {
+        font-size: 0.95rem;
+    }
+
+    .app {
+        margin: 0 0.75rem;
+    }
+
+    .forecast-strip {
+        flex-wrap: nowrap;
+    }
+
+    .forecast-card {
+        min-width: 0;
+    }
+}
+
+/* --- Responsive: Desktop (768px+) --- */
+@media (min-width: 768px) {
+    #header-container {
+        flex-wrap: nowrap;
+    }
+
+    .logo {
+        flex: 0 0 auto;
+        padding-right: 1rem;
+    }
+
+    #main-nav {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .nav-link {
+        font-size: 1rem;
+    }
+
+    .app {
+        margin: 0 auto;
+    }
 }
