@@ -1,4 +1,5 @@
 const THEME_KEY = 'theme';
+const LAST_CITY_KEY = 'lastCity';
 const GEOCODING_URL = 'https://geocoding-api.open-meteo.com/v1/search';
 const FORECAST_URL = 'https://api.open-meteo.com/v1/forecast';
 
@@ -12,6 +13,7 @@ let weatherContent;
 let currentWeatherCard;
 let forecastStrip;
 let insightsRows;
+let clearCityButton;
 
 function getPreferredTheme() {
   const saved = localStorage.getItem(THEME_KEY);
@@ -87,12 +89,14 @@ function showLoading() {
   loadingSpinner.hidden = false;
   cityInput.disabled = true;
   searchButton.disabled = true;
+  if (clearCityButton) clearCityButton.disabled = true;
 }
 
 function hideLoading() {
   loadingSpinner.hidden = true;
   cityInput.disabled = false;
   searchButton.disabled = false;
+  if (clearCityButton) clearCityButton.disabled = false;
 }
 
 function showError(message) {
@@ -109,10 +113,22 @@ function setAppState(state) {
   if (state === 'empty') {
     emptyState.hidden = false;
     weatherContent.hidden = true;
+    if (clearCityButton) clearCityButton.hidden = true;
   } else if (state === 'loaded') {
     emptyState.hidden = true;
     weatherContent.hidden = false;
+    if (clearCityButton) clearCityButton.hidden = false;
   }
+}
+
+function clearStoredCity() {
+  localStorage.removeItem(LAST_CITY_KEY);
+  cityInput.value = '';
+  hideError();
+  currentWeatherCard.innerHTML = '';
+  forecastStrip.innerHTML = '';
+  insightsRows.innerHTML = '';
+  setAppState('empty');
 }
 
 const WEATHER_ICONS = {
@@ -288,6 +304,9 @@ async function handleSearch(city) {
     renderForecast(weather);
     renderHourlyInsights(weather);
 
+    localStorage.setItem(LAST_CITY_KEY, trimmed);
+    cityInput.value = trimmed;
+
     setAppState('loaded');
   } catch (error) {
     showError(error.message || 'Something went wrong. Please try again.');
@@ -315,9 +334,17 @@ document.addEventListener('DOMContentLoaded', () => {
   currentWeatherCard = document.getElementById('current-weather');
   forecastStrip = document.getElementById('forecast-strip');
   insightsRows = document.getElementById('insights-rows');
+  clearCityButton = document.getElementById('clear-city');
 
   searchForm.addEventListener('submit', (event) => {
     event.preventDefault();
     handleSearch(cityInput.value);
   });
+
+  clearCityButton.addEventListener('click', clearStoredCity);
+
+  const savedCity = localStorage.getItem(LAST_CITY_KEY);
+  if (savedCity) {
+    handleSearch(savedCity);
+  }
 });
