@@ -298,8 +298,13 @@ body {
 
 .forecast-card {
     flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
     text-align: center;
-    padding: 0.75rem 0.5rem;
+    padding: 0.75rem 0.35rem;
     border: 2px solid var(--border);
     border-radius: var(--radius);
     background-color: var(--bg-page);
@@ -308,10 +313,57 @@ body {
     transition: background-color var(--transition-speed), border-color var(--transition-speed);
 }
 
+.forecast-day {
+    margin: 0;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.forecast-icon {
+    width: 28px;
+    height: 28px;
+    color: var(--accent);
+}
+
+.forecast-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.forecast-temps {
+    margin: 0;
+    display: flex;
+    gap: 0.35rem;
+    align-items: baseline;
+}
+
+.forecast-high {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+}
+
+.forecast-low {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
 .forecast-card--today {
     border-color: var(--accent);
+    background-color: var(--bg-card);
     color: var(--text-primary);
-    font-weight: bold;
+}
+
+.forecast-card--today .forecast-day {
+    color: var(--accent);
+}
+
+.insights-panel {
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    background-color: var(--bg-page);
+    padding: 1rem;
+    transition: background-color var(--transition-speed), border-color var(--transition-speed);
 }
 
 .insights-panel h2 {
@@ -320,10 +372,32 @@ body {
 }
 
 .insight-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
     padding: 0.5rem 0;
     border-bottom: 1px solid var(--border);
     color: var(--text-muted);
     font-size: 0.9rem;
+}
+
+.insight-time {
+    flex: 0 0 4.5rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.insight-condition {
+    flex: 1;
+    text-align: center;
+}
+
+.insight-temp {
+    flex: 0 0 3rem;
+    text-align: right;
+    font-weight: 600;
+    color: var(--text-primary);
 }
 
 .insight-row:last-child {

@@ -10,6 +10,8 @@ let loadingSpinner;
 let emptyState;
 let weatherContent;
 let currentWeatherCard;
+let forecastStrip;
+let insightsRows;
 
 function getPreferredTheme() {
   const saved = localStorage.getItem(THEME_KEY);
@@ -188,6 +190,86 @@ function renderCurrentWeather(location, weather) {
   `;
 }
 
+function formatHour(timeString) {
+  const date = new Date(timeString);
+  return date.toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    hour12: true,
+  });
+}
+
+function getDayLabel(dateString, index) {
+  if (index === 0) return 'Today';
+  const date = new Date(dateString + 'T12:00:00');
+  return date.toLocaleDateString('en-US', { weekday: 'short' });
+}
+
+function getTodayHourlyEntries(weather) {
+  const todayDate = weather.daily.time[0];
+  const entries = [];
+
+  for (let i = 0; i < weather.hourly.time.length; i++) {
+    if (weather.hourly.time[i].startsWith(todayDate)) {
+      entries.push({
+        time: weather.hourly.time[i],
+        temperature: weather.hourly.temperature_2m[i],
+        weatherCode: weather.hourly.weather_code[i],
+      });
+    }
+  }
+
+  if (entries.length === 0) return [];
+
+  const targetCount = 6;
+  if (entries.length <= targetCount) return entries;
+
+  const selected = [];
+  for (let i = 0; i < targetCount; i++) {
+    const index = Math.round((i * (entries.length - 1)) / (targetCount - 1));
+    selected.push(entries[index]);
+  }
+
+  return selected;
+}
+
+function renderForecast(weather) {
+  const daily = weather.daily;
+
+  forecastStrip.innerHTML = daily.time.slice(0, 5).map((date, index) => {
+    const { icon } = getWeatherInfo(daily.weather_code[index]);
+    const dayLabel = getDayLabel(date, index);
+    const high = Math.round(daily.temperature_2m_max[index]);
+    const low = Math.round(daily.temperature_2m_min[index]);
+    const todayClass = index === 0 ? ' forecast-card--today' : '';
+
+    return `
+      <div class="forecast-card${todayClass}">
+        <p class="forecast-day">${dayLabel}</p>
+        <div class="forecast-icon" aria-hidden="true">${icon}</div>
+        <p class="forecast-temps">
+          <span class="forecast-high">${high}°</span>
+          <span class="forecast-low">${low}°</span>
+        </p>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderHourlyInsights(weather) {
+  const entries = getTodayHourlyEntries(weather);
+
+  insightsRows.innerHTML = entries.map((entry) => {
+    const { label } = getWeatherInfo(entry.weatherCode);
+    return `
+      <div class="insight-row">
+        <span class="insight-time">${formatHour(entry.time)}</span>
+        <span class="insight-condition">${label}</span>
+        <span class="insight-temp">${Math.round(entry.temperature)}°C</span>
+      </div>
+    `;
+  }).join('');
+}
+
 async function handleSearch(city) {
   const trimmed = city.trim();
   if (!trimmed) return;
@@ -203,6 +285,8 @@ async function handleSearch(city) {
     console.log('Weather:', weather);
 
     renderCurrentWeather(location, weather);
+    renderForecast(weather);
+    renderHourlyInsights(weather);
 
     setAppState('loaded');
   } catch (error) {
@@ -229,6 +313,8 @@ document.addEventListener('DOMContentLoaded', () => {
   emptyState = document.getElementById('empty-state');
   weatherContent = document.getElementById('weather-content');
   currentWeatherCard = document.getElementById('current-weather');
+  forecastStrip = document.getElementById('forecast-strip');
+  insightsRows = document.getElementById('insights-rows');
 
   searchForm.addEventListener('submit', (event) => {
     event.preventDefault();
