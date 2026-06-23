@@ -113,6 +113,81 @@ function setAppState(state) {
   }
 }
 
+const WEATHER_ICONS = {
+  clear: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>',
+  partlyCloudy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/><circle cx="8" cy="8" r="3"/></svg>',
+  cloudy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>',
+  fog: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 14h16M4 18h16M4 10h16M4 6h16"/></svg>',
+  drizzle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/><path d="M8 22v-2M12 22v-2M16 22v-2"/></svg>',
+  rain: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/><path d="M7 22l1-3M12 22l1-3M17 22l1-3"/></svg>',
+  snow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/><path d="M8 22l2-2 2 2M12 18l2-2 2 2"/></svg>',
+  thunderstorm: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/><path d="M13 16l-2 4h3l-2 4"/></svg>',
+};
+
+function getWeatherInfo(code) {
+  if (code === 0) return { label: 'Clear', icon: WEATHER_ICONS.clear };
+  if (code === 1) return { label: 'Mainly Clear', icon: WEATHER_ICONS.partlyCloudy };
+  if (code === 2) return { label: 'Partly Cloudy', icon: WEATHER_ICONS.partlyCloudy };
+  if (code === 3) return { label: 'Overcast', icon: WEATHER_ICONS.cloudy };
+  if (code === 45 || code === 48) return { label: 'Fog', icon: WEATHER_ICONS.fog };
+  if (code >= 51 && code <= 57) return { label: 'Drizzle', icon: WEATHER_ICONS.drizzle };
+  if (code >= 61 && code <= 67) return { label: 'Rain', icon: WEATHER_ICONS.rain };
+  if (code >= 71 && code <= 77) return { label: 'Snow', icon: WEATHER_ICONS.snow };
+  if (code >= 80 && code <= 82) return { label: 'Rain Showers', icon: WEATHER_ICONS.rain };
+  if (code >= 85 && code <= 86) return { label: 'Snow Showers', icon: WEATHER_ICONS.snow };
+  if (code >= 95) return { label: 'Thunderstorm', icon: WEATHER_ICONS.thunderstorm };
+  return { label: 'Unknown', icon: WEATHER_ICONS.cloudy };
+}
+
+function getTempAccentClass(temp) {
+  if (temp < 10) return 'temp-cold';
+  if (temp <= 25) return 'temp-mild';
+  return 'temp-warm';
+}
+
+function formatCurrentDate(timeString) {
+  const date = new Date(timeString);
+  return date.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
+
+function renderCurrentWeather(location, weather) {
+  const current = weather.current;
+  const { label, icon } = getWeatherInfo(current.weather_code);
+  const tempClass = getTempAccentClass(current.temperature_2m);
+  const roundedTemp = Math.round(current.temperature_2m);
+
+  currentWeatherCard.innerHTML = `
+    <div class="weather-header">
+      <h2 class="weather-city">${location.name}, ${location.country}</h2>
+      <p class="weather-date">${formatCurrentDate(current.time)}</p>
+    </div>
+    <div class="weather-main">
+      <div class="weather-icon" aria-hidden="true">${icon}</div>
+      <div class="weather-temp ${tempClass}">${roundedTemp}°C</div>
+      <p class="weather-condition">${label}</p>
+    </div>
+    <div class="weather-stats">
+      <div class="stat-badge">
+        <span>Humidity</span>
+        <strong>${current.relative_humidity_2m}%</strong>
+      </div>
+      <div class="stat-badge">
+        <span>Wind</span>
+        <strong>${Math.round(current.wind_speed_10m)} km/h</strong>
+      </div>
+      <div class="stat-badge">
+        <span>Pressure</span>
+        <strong>${Math.round(current.surface_pressure)} hPa</strong>
+      </div>
+    </div>
+  `;
+}
+
 async function handleSearch(city) {
   const trimmed = city.trim();
   if (!trimmed) return;
@@ -127,8 +202,7 @@ async function handleSearch(city) {
     console.log('Location:', location);
     console.log('Weather:', weather);
 
-    currentWeatherCard.innerHTML =
-      `<p>Weather data loaded for <strong>${location.name}, ${location.country}</strong>. Open the browser console to inspect the API response.</p>`;
+    renderCurrentWeather(location, weather);
 
     setAppState('loaded');
   } catch (error) {
