@@ -25,9 +25,16 @@
         <section class="search-bar">
             <form id="search-form">
                 <input type="text" id="city-input" placeholder="Search for a city">
-                <button type="submit">Search</button>
+                <button type="submit" id="search-button">Search</button>
             </form>
         </section>
+
+        <div id="error-banner" class="error-banner" hidden role="alert"></div>
+
+        <div id="loading-spinner" class="loading-spinner" hidden>
+            <div class="spinner" aria-hidden="true"></div>
+            <p>Loading weather...</p>
+        </div>
 
         <section id="empty-state" class="empty-state">
             <p>Search for a city to see weather data</p>
